@@ -28,9 +28,9 @@ class ScannerActivity : BaseActivity(){
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (settingsStorage?.decodeBool(AppConfig.PREF_START_SCAN_IMMEDIATE) == true) {
+       if (settingsStorage?.decodeBool(AppConfig.PREF_START_SCAN_IMMEDIATE, true) == true) {
             launchScan()
-        }
+       }
     }
 
     private fun launchScan(){

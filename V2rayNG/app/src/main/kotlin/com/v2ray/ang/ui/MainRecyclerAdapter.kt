@@ -46,6 +46,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
     }
     var isRunning = false
 
+
     override fun getItemCount() = mActivity.mainViewModel.serversCache.size + 1
 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
@@ -74,8 +75,12 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
             }
             if (guid == mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER)) {
                 holder.itemMainBinding.layoutIndicator.setBackgroundResource(R.color.colorAccent)
+                holder.itemMainBinding.infoContainer.setBackgroundResource(R.color.colorSelectSemiTransparent)
+
             } else {
                 holder.itemMainBinding.layoutIndicator.setBackgroundResource(0)
+                holder.itemMainBinding.infoContainer.setBackgroundResource(0)
+
             }
             holder.itemMainBinding.tvSubscription.text = ""
             val json = subStorage?.decodeString(config.subscriptionId)

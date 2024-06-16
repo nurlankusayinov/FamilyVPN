@@ -18,6 +18,7 @@ object MmkvManager {
     const val ID_SETTING = "SETTING"
     const val KEY_SELECTED_SERVER = "SELECTED_SERVER"
     const val KEY_ANG_CONFIGS = "ANG_CONFIGS"
+    const val KEY_SUB_COUNTER = "SUB_COUNTER"
 
     private val mainStorage by lazy { MMKV.mmkvWithID(ID_MAIN, MMKV.MULTI_PROCESS_MODE) }
     private val serverStorage by lazy { MMKV.mmkvWithID(ID_SERVER_CONFIG, MMKV.MULTI_PROCESS_MODE) }
@@ -114,6 +115,18 @@ object MmkvManager {
             }
         }
     }
+    fun incrementSubscriberCount(): Int {
+        // Initialize or retrieve existing counter
+        var count = mainStorage.decodeInt(
+            KEY_SUB_COUNTER,
+            0
+        ) // Assuming '0' as the default value if the key doesn't exist
+        count++ // Increment the counter by 1
+
+        // Encode the new value back into MMKV
+        mainStorage.encode(KEY_SUB_COUNTER, count)
+        return count
+    }
 
     fun importUrlAsSubscription(url: String): Int {
         val subscriptions = decodeSubscriptions()
@@ -124,8 +137,10 @@ object MmkvManager {
         }
         val uri = URI(Utils.fixIllegalUrl(url))
         val subItem = SubscriptionItem()
-        subItem.remarks = Utils.urlDecode(uri.fragment ?: "import sub")
-        subItem.url = url
+        val count = incrementSubscriberCount()
+        subItem.remarks = Utils.urlDecode(uri.fragment ?: ("s$count"))
+        subItem.url = url        
+        subItem.autoUpdate = true
         subStorage?.encode(Utils.getUuid(), Gson().toJson(subItem))
         return 1
     }

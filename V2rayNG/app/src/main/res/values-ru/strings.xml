@@ -18,7 +18,8 @@
     <string name="toast_services_failure">Сбой при запуске служб</string>
 
     <!--ServerActivity-->
-    <string name="title_server">Профиль</string>
+    <string name="title_server">FamilyVPN</string>
+    <string name="empty_config">Ready to connect? Add your first subscription.</string>
     <string name="menu_item_add_config">Добавить профиль</string>
     <string name="menu_item_save_config">Сохранить профиль</string>
     <string name="menu_item_del_config">Удалить профиль</string>

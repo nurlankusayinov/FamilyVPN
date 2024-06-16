@@ -12,6 +12,7 @@ import android.text.TextUtils
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
@@ -23,7 +24,9 @@ import androidx.core.view.GravityCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.navigation.NavigationView
+
 import com.tbruyelle.rxpermissions.RxPermissions
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
@@ -90,10 +93,35 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 //                tv_test_state.text = getString(R.string.connection_test_fail)
             }
         }
+        binding.buttonFromClipboard.setOnClickListener {
+            importClipboard()
+        }
+
+       binding.buttonFromQRCode.setOnClickListener {
+            importQRcode(true)
+
+       }
 
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         binding.recyclerView.adapter = adapter
+
+        adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onChanged() {
+                super.onChanged()
+                updateButtonsVisibility()
+            }
+
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                super.onItemRangeInserted(positionStart, itemCount)
+                updateButtonsVisibility()
+            }
+
+            override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
+                super.onItemRangeRemoved(positionStart, itemCount)
+                updateButtonsVisibility()
+            }
+        })
 
         val callback = SimpleItemTouchHelperCallback(adapter)
         mItemTouchHelper = ItemTouchHelper(callback)
@@ -129,6 +157,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 }
             }
         })
+
+        // Check initial visibility of buttons
+        updateButtonsVisibility()
     }
 
     private fun setupViewModel() {
@@ -156,7 +187,11 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
         mainViewModel.startListenBroadcast()
     }
-
+    private fun updateButtonsVisibility() {
+        val isEmpty = adapter.itemCount <= 1
+        print(adapter.itemCount)
+        binding.buttonContainer.visibility = if (isEmpty) View.VISIBLE else View.GONE
+    }
     fun startV2Ray() {
         if (mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER).isNullOrEmpty()) {
             return
@@ -198,121 +233,123 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             importClipboard()
             true
         }
-        R.id.import_manually_vmess -> {
-            importManually(EConfigType.VMESS.value)
-            true
-        }
-        R.id.import_manually_vless -> {
-            importManually(EConfigType.VLESS.value)
-            true
-        }
-        R.id.import_manually_ss -> {
-            importManually(EConfigType.SHADOWSOCKS.value)
-            true
-        }
-        R.id.import_manually_socks -> {
-            importManually(EConfigType.SOCKS.value)
-            true
-        }
-        R.id.import_manually_trojan -> {
-            importManually(EConfigType.TROJAN.value)
-            true
-        }
-        R.id.import_manually_wireguard -> {
-            importManually(EConfigType.WIREGUARD.value)
-            true
-        }
-        R.id.import_config_custom_clipboard -> {
-            importConfigCustomClipboard()
-            true
-        }
-        R.id.import_config_custom_local -> {
-            importConfigCustomLocal()
-            true
-        }
-        R.id.import_config_custom_url -> {
-            importConfigCustomUrlClipboard()
-            true
-        }
-        R.id.import_config_custom_url_scan -> {
-            importQRcode(false)
-            true
-        }
+
+
+//        R.id.import_manually_vmess -> {
+//            importManually(EConfigType.VMESS.value)
+//            true
+//        }
+//        R.id.import_manually_vless -> {
+//            importManually(EConfigType.VLESS.value)
+//            true
+//        }
+//        R.id.import_manually_ss -> {
+//            importManually(EConfigType.SHADOWSOCKS.value)
+//            true
+//        }
+//        R.id.import_manually_socks -> {
+//            importManually(EConfigType.SOCKS.value)
+//            true
+//        }
+//        R.id.import_manually_trojan -> {
+//            importManually(EConfigType.TROJAN.value)
+//            true
+//        }
+//        R.id.import_manually_wireguard -> {
+//            importManually(EConfigType.WIREGUARD.value)
+//            true
+//        }
+//        R.id.import_config_custom_clipboard -> {
+//            importConfigCustomClipboard()
+//            true
+//        }
+//        R.id.import_config_custom_local -> {
+//            importConfigCustomLocal()
+//            true
+//        }
+//        R.id.import_config_custom_url -> {
+//            importConfigCustomUrlClipboard()
+//            true
+//        }
+//        R.id.import_config_custom_url_scan -> {
+//            importQRcode(false)
+//            true
+//        }
 
         R.id.sub_update -> {
             importConfigViaSub()
             true
         }
 
-        R.id.export_all -> {
-            if (AngConfigManager.shareNonCustomConfigsToClipboard(this, mainViewModel.serverList) == 0) {
-                toast(R.string.toast_success)
-            } else {
-                toast(R.string.toast_failure)
-            }
-            true
-        }
-
-        R.id.ping_all -> {
-            mainViewModel.testAllTcping()
-            true
-        }
-
-        R.id.real_ping_all -> {
-            mainViewModel.testAllRealPing()
-            true
-        }
-
-        R.id.service_restart -> {
-            restartV2Ray()
-            true
-        }
-
-        R.id.del_all_config -> {
-            AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
-                    .setPositiveButton(android.R.string.ok) { _, _ ->
-                        MmkvManager.removeAllServer()
-                        mainViewModel.reloadServerList()
-                    }
-                    .setNegativeButton(android.R.string.no) {_, _ ->
-                        //do noting
-                    }
-                    .show()
-            true
-        }
-        R.id.del_duplicate_config-> {
-            AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
-                .setPositiveButton(android.R.string.ok) { _, _ ->
-                    mainViewModel.removeDuplicateServer()
-                    mainViewModel.reloadServerList()
-                }
-                .setNegativeButton(android.R.string.no) {_, _ ->
-                    //do noting
-                }
-                .show()
-            true
-        }
-        R.id.del_invalid_config -> {
-            AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
-                .setPositiveButton(android.R.string.ok) { _, _ ->
-                    MmkvManager.removeInvalidServer()
-                    mainViewModel.reloadServerList()
-                }
-                .setNegativeButton(android.R.string.no) {_, _ ->
-                    //do noting
-                }
-                .show()
-            true
-        }
-        R.id.sort_by_test_results -> {
-            MmkvManager.sortByTestResults()
-            mainViewModel.reloadServerList()
-            true
-        }
-        R.id.filter_config -> {
-            mainViewModel.filterConfig(this)
-            true
-        }
+//        R.id.export_all -> {
+//            if (AngConfigManager.shareNonCustomConfigsToClipboard(this, mainViewModel.serverList) == 0) {
+//                toast(R.string.toast_success)
+//            } else {
+//                toast(R.string.toast_failure)
+//            }
+//            true
+//        }
+//
+//        R.id.ping_all -> {
+//            mainViewModel.testAllTcping()
+//            true
+//        }
+//
+//        R.id.real_ping_all -> {
+//            mainViewModel.testAllRealPing()
+//            true
+//        }
+//
+//        R.id.service_restart -> {
+//            restartV2Ray()
+//            true
+//        }
+//
+//        R.id.del_all_config -> {
+//            AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
+//                    .setPositiveButton(android.R.string.ok) { _, _ ->
+//                        MmkvManager.removeAllServer()
+//                        mainViewModel.reloadServerList()
+//                    }
+//                    .setNegativeButton(android.R.string.no) {_, _ ->
+//                        //do noting
+//                    }
+//                    .show()
+//            true
+//        }
+//        R.id.del_duplicate_config-> {
+//            AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
+//                .setPositiveButton(android.R.string.ok) { _, _ ->
+//                    mainViewModel.removeDuplicateServer()
+//                    mainViewModel.reloadServerList()
+//                }
+//                .setNegativeButton(android.R.string.no) {_, _ ->
+//                    //do noting
+//                }
+//                .show()
+//            true
+//        }
+//        R.id.del_invalid_config -> {
+//            AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
+//                .setPositiveButton(android.R.string.ok) { _, _ ->
+//                    MmkvManager.removeInvalidServer()
+//                    mainViewModel.reloadServerList()
+//                }
+//                .setNegativeButton(android.R.string.no) {_, _ ->
+//                    //do noting
+//                }
+//                .show()
+//            true
+//        }
+//        R.id.sort_by_test_results -> {
+//            MmkvManager.sortByTestResults()
+//            mainViewModel.reloadServerList()
+//            true
+//        }
+//        R.id.filter_config -> {
+//            mainViewModel.filterConfig(this)
+//            true
+//        }
 
         else -> super.onOptionsItemSelected(item)
     }
@@ -588,10 +625,36 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
         when (item.itemId) {
+            R.id.sub_update_all -> {
+                importConfigViaSub()
+                true
+            //    startActivity(Intent(this, SubSettingActivity::class.java))
+            //  val dialog = AlertDialog.Builder(this)
+            //     .setView(LayoutProgressBinding.inflate(layoutInflater).root)
+            //     .setCancelable(false)
+            //     .show()
+
+            // lifecycleScope.launch(Dispatchers.IO) {
+            //     val count = AngConfigManager.updateConfigViaSubAll()
+            //     delay(500L)
+            //     launch(Dispatchers.Main) {
+            //         if (count > 0) {
+            //             toast(R.string.toast_success)
+            //         } else {
+            //             toast(R.string.toast_failure)
+            //         }
+            //         dialog.dismiss()
+            //     }
+            // }
+
+            // true
+
+
+           }
             //R.id.server_profile -> activityClass = MainActivity::class.java
-            R.id.sub_setting -> {
-                startActivity(Intent(this, SubSettingActivity::class.java))
-            }
+           R.id.sub_setting -> {
+               startActivity(Intent(this, SubSettingActivity::class.java))
+           }
             R.id.settings -> {
                 startActivity(Intent(this, SettingsActivity::class.java)
                         .putExtra("isRunning", mainViewModel.isRunning.value == true))
@@ -599,12 +662,12 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             R.id.user_asset_setting -> {
                 startActivity(Intent(this, UserAssetActivity::class.java))
             }
-            R.id.promotion -> {
-                Utils.openUri(this, "${Utils.decode(AppConfig.PromotionUrl)}?t=${System.currentTimeMillis()}")
-            }
-            R.id.logcat -> {
-                startActivity(Intent(this, LogcatActivity::class.java))
-            }
+//            R.id.promotion -> {
+//                Utils.openUri(this, "${Utils.decode(AppConfig.PromotionUrl)}?t=${System.currentTimeMillis()}")
+//            }
+//            R.id.logcat -> {
+//                startActivity(Intent(this, LogcatActivity::class.java))
+//            }
             R.id.about-> {
                 startActivity(Intent(this, AboutActivity::class.java))
             }

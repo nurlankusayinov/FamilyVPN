@@ -1,5 +1,5 @@
 ---
-name: v2rayNG程序问题
+name: FamilyVPN程序问题
 about: 创建一个报告来帮助我们改进
 ---
 

@@ -18,7 +18,8 @@
     <string name="toast_services_failure">启动服务失败</string>
 
     <!--ServerActivity-->
-    <string name="title_server">配置文件</string>
+    <string name="title_server">FamilyVPN</string>
+    <string name="empty_config">Ready to connect? Add your first subscription.</string>
     <string name="menu_item_add_config">添加配置</string>
     <string name="menu_item_save_config">保存配置</string>
     <string name="menu_item_del_config">删除配置</string>

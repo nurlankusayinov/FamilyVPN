@@ -33,6 +33,7 @@ class SubSettingRecyclerAdapter(val activity: SubSettingActivity) :
     override fun onBindViewHolder(holder: MainViewHolder, position: Int) {
         val subId = mActivity.subscriptions[position].first
         val subItem = mActivity.subscriptions[position].second
+
         holder.itemSubSettingBinding.tvName.text = subItem.remarks
         holder.itemSubSettingBinding.tvUrl.text = subItem.url
         if (subItem.enabled) {
@@ -43,15 +44,18 @@ class SubSettingRecyclerAdapter(val activity: SubSettingActivity) :
         holder.itemView.setBackgroundColor(Color.TRANSPARENT)
 
         holder.itemSubSettingBinding.layoutEdit.setOnClickListener {
+            MmkvManager.removeSubscription(subId)
+            notifyItemRemoved(position)
+            mActivity.recreate()
+        }
+        holder.itemSubSettingBinding.infoContainer.setOnClickListener {
             mActivity.startActivity(
                 Intent(mActivity, SubEditActivity::class.java)
                     .putExtra("subId", subId)
             )
-        }
-        holder.itemSubSettingBinding.infoContainer.setOnClickListener {
-            subItem.enabled = !subItem.enabled
-            subStorage?.encode(subId, Gson().toJson(subItem))
-            notifyItemChanged(position)
+            // subItem.enabled = !subItem.enabled
+            // subStorage?.encode(subId, Gson().toJson(subItem))
+            // notifyItemChanged(position)
         }
 
         if (TextUtils.isEmpty(subItem.url)) {

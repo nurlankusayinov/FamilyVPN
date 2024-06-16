@@ -1,0 +1,31 @@
+<!-- res/layout/custom_menu_item.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="0dp"
+    android:gravity="center_vertical">
+
+    <TextView
+        android:id="@+id/menu_item_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textAppearance="?attr/textAppearanceListItem"
+        android:paddingEnd="8dp"
+        android:gravity="center_vertical" />
+
+      <Button
+                            android:id="@+id/buttonFromClipboard"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+
+                            android:text="@string/menu_item_import_config_clipboard"
+                            android:drawableLeft="@drawable/ic_file_24dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:enabled="true"
+                            />
+</LinearLayout>

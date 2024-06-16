@@ -78,6 +78,7 @@
             android:title="@string/title_pref_confirm_remove" />
 
         <CheckBoxPreference
+            android:defaultValue="true"
             android:key="pref_start_scan_immediate"
             android:summary="@string/summary_pref_start_scan_immediate"
             android:title="@string/title_pref_start_scan_immediate" />

@@ -197,9 +197,9 @@ class SettingsActivity : BaseActivity() {
             fragmentLength?.summary = settingsStorage.decodeString(AppConfig.PREF_FRAGMENT_LENGTH, "50-100")
             fragmentInterval?.summary = settingsStorage.decodeString(AppConfig.PREF_FRAGMENT_INTERVAL, "10-20")
 
-            autoUpdateCheck?.isChecked = settingsStorage.getBoolean(AppConfig.SUBSCRIPTION_AUTO_UPDATE, false)
+            autoUpdateCheck?.isChecked = settingsStorage.getBoolean(AppConfig.SUBSCRIPTION_AUTO_UPDATE, true)
             autoUpdateInterval?.summary = settingsStorage.decodeString(AppConfig.SUBSCRIPTION_AUTO_UPDATE_INTERVAL,AppConfig.SUBSCRIPTION_DEFAULT_UPDATE_INTERVAL)
-            autoUpdateInterval?.isEnabled = settingsStorage.getBoolean(AppConfig.SUBSCRIPTION_AUTO_UPDATE, false)
+            autoUpdateInterval?.isEnabled = settingsStorage.getBoolean(AppConfig.SUBSCRIPTION_AUTO_UPDATE, true)
 
             socksPort?.summary = settingsStorage.decodeString(AppConfig.PREF_SOCKS_PORT, AppConfig.PORT_SOCKS)
             httpPort?.summary = settingsStorage.decodeString(AppConfig.PREF_HTTP_PORT, AppConfig.PORT_HTTP)
@@ -229,6 +229,7 @@ class SettingsActivity : BaseActivity() {
             }
 
             listOf(
+                AppConfig.PREF_START_SCAN_IMMEDIATE,
                 AppConfig.PREF_SNIFFING_ENABLED,
             ).forEach { key ->
                 findPreference<CheckBoxPreference>(key)?.isChecked =
@@ -240,7 +241,6 @@ class SettingsActivity : BaseActivity() {
                 AppConfig.PREF_BYPASS_APPS,
                 AppConfig.PREF_SPEED_ENABLED,
                 AppConfig.PREF_CONFIRM_REMOVE,
-                AppConfig.PREF_START_SCAN_IMMEDIATE,
                 AppConfig.PREF_PREFER_IPV6,
                 AppConfig.PREF_PROXY_SHARING,
                 AppConfig.PREF_ALLOW_INSECURE
