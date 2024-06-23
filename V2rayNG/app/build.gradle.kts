@@ -12,15 +12,17 @@ android {
         minSdk = 21
         targetSdk = 34
         versionCode = 563
-        versionName = "1.8.27"
+        versionName = "1.8.28"
         multiDexEnabled = true
         splits.abi {
             reset()
+            isEnable = true
+            isUniversalApk = true
             include(
                 "arm64-v8a",
-                "armeabi-v7a",
-                "x86_64",
-                "x86"
+                "armeabi-v7a"
+                // "x86_64",
+                // "x86"
             )
         }
     }
@@ -31,8 +33,9 @@ android {
     }
     buildTypes {
         release {
-            isMinifyEnabled = false
-
+            // isMinifyEnabled = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            // isShrinkResources = true
         }
         debug {
             isMinifyEnabled = false
@@ -50,12 +53,12 @@ android {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 
-    splits {
-        abi {
-            isEnable = true
-            isUniversalApk = false
-        }
-    }
+    // splits {
+    //     abi {
+    //         isEnable = true
+    //         isUniversalApk = false
+    //     }
+    // }
 
     applicationVariants.all {
         val variant = this

@@ -369,7 +369,7 @@ object Utils {
             )
         }
         conn.setRequestProperty("Connection", "close")
-        conn.setRequestProperty("User-agent", "familyng/${BuildConfig.VERSION_NAME}")
+        conn.setRequestProperty("User-Agent", "familyng/${BuildConfig.VERSION_NAME}")
         url.userInfo?.let {
             conn.setRequestProperty("Authorization",
                 "Basic ${encode(urlDecode(it))}")
